@@ -1,0 +1,10 @@
+# Configuration definitions for thorn LAPACK
+
+PROVIDES LAPACK
+{
+  SCRIPT LAPACK.sh
+  LANG bash
+  OPTIONS LAPACK_DIR LAPACK_LIBS
+}
+
+REQUIRES BLAS
