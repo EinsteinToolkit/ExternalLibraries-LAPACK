@@ -122,7 +122,7 @@ if [ "${LAPACK_DIR}" != '/usr' -a "${LAPACK_DIR}" != '/usr/local' ]; then
     LAPACK_INC_DIRS=
     LAPACK_LIB_DIRS="${LAPACK_DIR}"
 fi
-LAPACK_LIBS='lapack'
+: ${LAPACK_LIBS='lapack'}
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
