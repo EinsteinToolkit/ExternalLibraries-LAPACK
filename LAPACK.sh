@@ -91,7 +91,9 @@ if [ -z "${LAPACK_DIR}" ]; then
         echo "LAPACK: Building..."
         ${F77} ${F77FLAGS} -c *.f
         ${AR} ${ARFLAGS} lapack.a *.o
-        ${RANLIB} ${RANLIBFLAGS} lapack.a
+	if [ ${USE_RANLIB} = 'yes' ]; then
+	    ${RANLIB} ${RANLIBFLAGS} lapack.a
+        fi
         
         echo "LAPACK: Installing..."
         cp lapack.a ${LAPACK_DIR}
