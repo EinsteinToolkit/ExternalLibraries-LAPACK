@@ -90,13 +90,13 @@ if [ -z "${LAPACK_DIR}" ]; then
         
         echo "LAPACK: Building..."
         ${F77} ${F77FLAGS} -c *.f
-        ${AR} ${ARFLAGS} lapack.a *.o
+        ${AR} ${ARFLAGS} liblapack.a *.o
 	if [ ${USE_RANLIB} = 'yes' ]; then
-	    ${RANLIB} ${RANLIBFLAGS} lapack.a
+	    ${RANLIB} ${RANLIBFLAGS} liblapack.a
         fi
         
         echo "LAPACK: Installing..."
-        cp lapack.a ${LAPACK_DIR}
+        cp liblapack.a ${LAPACK_DIR}
         popd
         
         echo 'done' > done-${NAME}
