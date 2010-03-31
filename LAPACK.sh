@@ -89,7 +89,7 @@ if [ -z "${LAPACK_DIR}" ]; then
         pushd build-${NAME}/${NAME}/SRC
         
         echo "LAPACK: Building..."
-        ${F77} ${F77FLAGS} -c *.f
+        ${F77} ${F77FLAGS} -c *.f ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
         ${AR} ${ARFLAGS} liblapack.a *.o
 	if [ ${USE_RANLIB} = 'yes' ]; then
 	    ${RANLIB} ${RANLIBFLAGS} liblapack.a
