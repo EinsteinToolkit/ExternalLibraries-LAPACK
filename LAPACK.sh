@@ -16,7 +16,7 @@ set -e                          # Abort on errors
 
 if [ -z "${LAPACK_DIR}" ]; then
     echo "BEGIN MESSAGE"
-    echo "LAPACK selected, but LAPACK_DIR not set.  Checking some places..."
+    echo "LAPACK selected, but LAPACK_DIR not set. Checking some places..."
     echo "END MESSAGE"
     
     FILES="liblapack.a liblapack.so"
@@ -47,68 +47,89 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${LAPACK_DIR}" ]; then
+if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
     echo "BEGIN MESSAGE"
     echo "Building LAPACK..."
     echo "END MESSAGE"
     
     # Set locations
-    NAME=lapack-3.2.1
+    THORN=LAPACK
+    NAME=lapack-3.2.2
     SRCDIR=$(dirname $0)
-    INSTALL_DIR=${SCRATCH_BUILD}
-    LAPACK_DIR=${INSTALL_DIR}/${NAME}
-
-    # Clean up environment
-    unset LIBS
+    BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
+    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
+    LAPACK_DIR=${INSTALL_DIR}
     
 (
     exec >&2                    # Redirect stdout to stderr
     set -x                      # Output commands
     set -e                      # Abort on errors
-    cd ${INSTALL_DIR}
-    if [ -e done-${NAME} -a done-${NAME} -nt ${SRCDIR}/dist/${NAME}.tgz \
-                         -a done-${NAME} -nt ${SRCDIR}/LAPACK.sh ]
+    cd ${SCRATCH_BUILD}
+    if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
+                         -a ${DONE_FILE} -nt ${SRCDIR}/LAPACK.sh ]
     then
         echo "LAPACK: The enclosed LAPACK library has already been built; doing nothing"
     else
         echo "LAPACK: Building enclosed LAPACK library"
         
-        echo "LAPACK: Unpacking archive..."
-        rm -rf build-${NAME}
-        mkdir build-${NAME}
-        pushd build-${NAME}
+        # Should we use gmake or make?
+        MAKE=$(gmake --help > /dev/null 2>&1 && echo gmake || echo make)
         # Should we use gtar or tar?
         TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
+        
+        # Set up environment
+        unset LIBS
+	if [ ${USE_RANLIB} != 'yes' ]; then
+            RANLIB=': ranlib'
+        fi
+        
+        echo "LAPACK: Preparing directory structure..."
+        mkdir build external done 2> /dev/null || true
+        rm -rf ${BUILD_DIR} ${INSTALL_DIR}
+        mkdir ${BUILD_DIR} ${INSTALL_DIR}
+        
+        echo "LAPACK: Unpacking archive..."
+        pushd ${BUILD_DIR}
         ${TAR} xzf ${SRCDIR}/dist/${NAME}.tgz
-        popd
         
         echo "LAPACK: Configuring..."
-        rm -rf ${NAME}
-        mkdir ${NAME}
-        pushd build-${NAME}/${NAME}/SRC
+        cd ${NAME}/SRC
         
         echo "LAPACK: Building..."
         if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
             FIXEDF77FLAGS=-qfixed
         fi
-        ${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
-        ${AR} ${ARFLAGS} liblapack.a *.o
-	if [ ${USE_RANLIB} = 'yes' ]; then
-	    ${RANLIB} ${RANLIBFLAGS} liblapack.a
-        fi
+        #${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
+        #${AR} ${ARFLAGS} liblapack.a *.o
+	#if [ ${USE_RANLIB} = 'yes' ]; then
+	#    ${RANLIB} ${RANLIBFLAGS} liblapack.a
+        #fi
+        cat > make.cactus <<EOF
+SRCS = $(echo *.f) ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
+liblapack.a: \$(SRCS:%.f=%.o)
+	${AR} ${ARFLAGS} \$@ \$^
+	${RANLIB} ${RANLIBFLAGS} \$@
+%.o: %.f
+	${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c \$*.f -o \$*.o
+EOF
+        ${MAKE} -f make.cactus
         
         echo "LAPACK: Installing..."
         cp liblapack.a ${LAPACK_DIR}
         popd
         
-        echo 'done' > done-${NAME}
+        echo "LAPACK: Cleaning up..."
+        rm -rf ${BUILD_DIR}
+        
+        date > ${DONE_FILE}
         echo "LAPACK: Done."
     fi
 )
 
     if (( $? )); then
         echo 'BEGIN ERROR'
-        echo 'Error while building LAPACK.  Aborting.'
+        echo 'Error while building LAPACK. Aborting.'
         echo 'END ERROR'
         exit 1
     fi
