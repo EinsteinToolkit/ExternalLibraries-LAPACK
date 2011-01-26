@@ -54,7 +54,7 @@ if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
     
     # Set locations
     THORN=LAPACK
-    NAME=lapack-3.2.2
+    NAME=lapack-3.3.0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
