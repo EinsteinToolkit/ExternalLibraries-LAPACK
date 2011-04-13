@@ -143,7 +143,7 @@ fi
 ################################################################################
 
 # Set options
-if [ "${LAPACK_DIR}" != '/usr' -a "${LAPACK_DIR}" != '/usr/local' ]; then
+if [ "${LAPACK_DIR}" != '/usr/lib' -a "${LAPACK_DIR}" != '/usr/local/lib' ]; then
     LAPACK_INC_DIRS=
     LAPACK_LIB_DIRS="${LAPACK_DIR}"
 fi
