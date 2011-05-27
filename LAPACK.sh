@@ -54,7 +54,7 @@ if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
     
     # Set locations
     THORN=LAPACK
-    NAME=lapack-3.3.0
+    NAME=lapack-3.3.1
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -72,11 +72,6 @@ if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
         echo "LAPACK: The enclosed LAPACK library has already been built; doing nothing"
     else
         echo "LAPACK: Building enclosed LAPACK library"
-        
-        # Should we use gmake or make?
-        MAKE=$(gmake --help > /dev/null 2>&1 && echo gmake || echo make)
-        # Should we use gtar or tar?
-        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
         
         # Set up environment
         unset LIBS
