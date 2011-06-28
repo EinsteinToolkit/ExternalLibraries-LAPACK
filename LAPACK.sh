@@ -60,6 +60,13 @@ if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     LAPACK_DIR=${INSTALL_DIR}
+
+    if [ "${F77}" = "none" ]; then
+        echo 'BEGIN ERROR'
+        echo "Building LAPACK requires a fortran compiler, but there is none configured: F77 = $F77.  Aborting."
+        echo 'END ERROR'
+        exit 1
+    fi
     
 (
     exec >&2                    # Redirect stdout to stderr
