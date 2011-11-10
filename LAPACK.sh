@@ -47,7 +47,9 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${LAPACK_DIR}" -o "${LAPACK_DIR}" = 'BUILD' ]; then
+if [ -z "${LAPACK_DIR}"                                                 \
+     -o "$(echo "${LAPACK_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Building LAPACK..."
     echo "END MESSAGE"
