@@ -5,7 +5,9 @@
 ################################################################################
 
 # Set up shell
-set -x                          # Output commands
+if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+    set -x                      # Output commands
+fi
 set -e                          # Abort on errors
 
 
@@ -51,46 +53,51 @@ if [ -z "${LAPACK_DIR}"                                                 \
      -o "$(echo "${LAPACK_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
 then
     echo "BEGIN MESSAGE"
-    echo "Building LAPACK..."
+    echo "Using bundled LAPACK..."
     echo "END MESSAGE"
     
     # Set locations
     THORN=LAPACK
-    NAME=lapack-3.3.1
+    NAME=lapack-3.4.0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${LAPACK_INSTALL_DIR}" ]; then
-        echo "BEGIN MESSAGE"
-        echo "LAPACK install directory, LAPACK_INSTALL_DIR, not set. Installing in the default configuration location. "
-        echo "END MESSAGE"
-     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+        INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
     else
         echo "BEGIN MESSAGE"
-        echo "LAPACK install directory, LAPACK_INSTALL_DIR, selected. Installing LAPACK at ${LAPACK_INSTALL_DIR} "
+        echo "Installing LAPACK into ${LAPACK_INSTALL_DIR}"
         echo "END MESSAGE"
-     INSTALL_DIR=${LAPACK_INSTALL_DIR}
+        INSTALL_DIR=${LAPACK_INSTALL_DIR}
     fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     LAPACK_DIR=${INSTALL_DIR}
 
     if [ "${F77}" = "none" ]; then
         echo 'BEGIN ERROR'
-        echo "Building LAPACK requires a fortran compiler, but there is none configured: F77 = $F77.  Aborting."
+        echo "Building LAPACK requires a fortran compiler, but there is none configured: F77 = $F77. Aborting."
         echo 'END ERROR'
         exit 1
     fi
     
-(
-    exec >&2                    # Redirect stdout to stderr
-    set -x                      # Output commands
-    set -e                      # Abort on errors
-    cd ${SCRATCH_BUILD}
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
                          -a ${DONE_FILE} -nt ${SRCDIR}/LAPACK.sh ]
     then
-        echo "LAPACK: The enclosed LAPACK library has already been built; doing nothing"
+        echo "BEGIN MESSAGE"
+        echo "LAPACK has already been built; doing nothing"
+        echo "END MESSAGE"
     else
-        echo "LAPACK: Building enclosed LAPACK library"
+        echo "BEGIN MESSAGE"
+        echo "Building LAPACK"
+        echo "END MESSAGE"
+        
+        # Build in a subshell
+        (
+        exec >&2                # Redirect stdout to stderr
+        if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+            set -x              # Output commands
+        fi
+        set -e                  # Abort on errors
+        cd ${SCRATCH_BUILD}
         
         # Set up environment
         unset LIBS
@@ -138,16 +145,17 @@ EOF
         
         date > ${DONE_FILE}
         echo "LAPACK: Done."
+        
+        )
+        
+        if (( $? )); then
+            echo 'BEGIN ERROR'
+            echo 'Error while building LAPACK. Aborting.'
+            echo 'END ERROR'
+            exit 1
+        fi
     fi
-)
-
-    if (( $? )); then
-        echo 'BEGIN ERROR'
-        echo 'Error while building LAPACK. Aborting.'
-        echo 'END ERROR'
-        exit 1
-    fi
-
+    
 fi
 
 
