@@ -80,7 +80,7 @@ then
     fi
     
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
-                         -a ${DONE_FILE} -nt ${SRCDIR}/LAPACK.sh ]
+                         -a ${DONE_FILE} -nt ${SRCDIR}/configure.sh ]
     then
         echo "BEGIN MESSAGE"
         echo "LAPACK has already been built; doing nothing"
