@@ -112,7 +112,7 @@ then
         
         echo "LAPACK: Unpacking archive..."
         pushd ${BUILD_DIR}
-        ${TAR} xzf ${SRCDIR}/dist/${NAME}.tgz
+        ${TAR?} xzf ${SRCDIR}/dist/${NAME}.tgz
         
         echo "LAPACK: Configuring..."
         cd ${NAME}/SRC
