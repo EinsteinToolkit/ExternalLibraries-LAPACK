@@ -166,8 +166,8 @@ fi
 
 # Set options
 if [ "${LAPACK_DIR}" != '/usr/lib' -a "${LAPACK_DIR}" != '/usr/local/lib' ]; then
-    LAPACK_INC_DIRS=
-    LAPACK_LIB_DIRS="${LAPACK_DIR}"
+    : ${LAPACK_INC_DIRS=}
+    : ${LAPACK_LIB_DIRS="${LAPACK_DIR}"}
 fi
 : ${LAPACK_LIBS='lapack'}
 
