@@ -145,7 +145,6 @@ EOF
         
         date > ${DONE_FILE}
         echo "LAPACK: Done."
-        
         )
         
         if (( $? )); then
