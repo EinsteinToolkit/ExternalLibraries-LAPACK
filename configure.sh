@@ -16,7 +16,9 @@ set -e                          # Abort on errors
 # Search
 ################################################################################
 
-if [ -z "${LAPACK_DIR}" ]; then
+if [ -z "${LAPACK_DIR}" \
+     -o "$(echo "${LAPACK_DIR}" | tr '[a-z]' '[A-Z]')" = 'NO_BUILD' ] 
+then
     echo "BEGIN MESSAGE"
     echo "LAPACK selected, but LAPACK_DIR not set. Checking some places..."
     echo "END MESSAGE"
