@@ -164,7 +164,9 @@ fi
 ################################################################################
 
 # Set options
-if [ "${LAPACK_DIR}" != '/usr/lib' -a "${LAPACK_DIR}" != '/usr/local/lib' ]; then
+if [ "${LAPACK_DIR}" != '/usr/lib' -a "${LAPACK_DIR}" != '/usr/local/lib' -a \
+     "${LAPACK_DIR}" != 'NO_BUILD' ]
+then
     : ${LAPACK_INC_DIRS=}
     : ${LAPACK_LIB_DIRS="${LAPACK_DIR}"}
 fi
