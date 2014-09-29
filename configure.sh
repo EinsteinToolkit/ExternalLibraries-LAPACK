@@ -22,7 +22,7 @@ if [ -z "${LAPACK_DIR}" ]; then
     echo "END MESSAGE"
     
     FILES="liblapack.a liblapack.so"
-    DIRS="/usr/lib /usr/local/lib /usr/lib64/atlas /usr/lib/atlas-base/atlas ${HOME}"
+    DIRS="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib64/atlas /usr/lib/atlas /usr/lib64/atlas-base/atlas /usr/lib/atlas-base/atlas ${HOME}"
     for file in $FILES; do
         for dir in $DIRS; do
             if test -r "$dir/$file"; then
