@@ -76,7 +76,7 @@ then
     # Set locations
     THORN=LAPACK
     NAME=lapack-3.4.2
-    SRCDIR=$(dirname $0)
+    SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${LAPACK_INSTALL_DIR}" ]; then
         INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -184,17 +184,17 @@ fi
 ################################################################################
 
 # Set options
-if [ "${LAPACK_DIR}" != '/usr/lib' -a "${LAPACK_DIR}" != '/usr/local/lib' -a \
-     "${LAPACK_DIR}" != 'NO_BUILD' ]
-then
+if [ "${LAPACK_DIR}" != 'NO_BUILD' ]; then
     : ${LAPACK_INC_DIRS=}
     : ${LAPACK_LIB_DIRS="${LAPACK_DIR}"}
 fi
 : ${LAPACK_LIBS='lapack'}
 
+LAPACK_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${LAPACK_INC_DIRS})"
+LAPACK_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${LAPACK_LIB_DIRS})"
+
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
-echo "HAVE_LAPACK     = 1"
 echo "LAPACK_DIR      = ${LAPACK_DIR}"
 echo "LAPACK_INC_DIRS = ${LAPACK_INC_DIRS}"
 echo "LAPACK_LIB_DIRS = ${LAPACK_LIB_DIRS}"
