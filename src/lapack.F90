@@ -2,7 +2,7 @@ module lapack
   implicit none
   
   integer, parameter :: izero = 0
-  integer, parameter :: blas_integer_kind = kind(izero)
+  integer, parameter :: lapack_integer_kind = kind(izero)
   
   interface geev
      SUBROUTINE SGEEV( JOBVL, JOBVR, N, A, LDA, WR, WI, VL, LDVL, VR, &
