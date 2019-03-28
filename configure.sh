@@ -10,47 +10,36 @@ if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
 fi
 set -e                          # Abort on errors
 
-
+. $CCTK_HOME/lib/make/bash_utils.sh
 
 ################################################################################
 # Search
 ################################################################################
 
-if [ -z "${LAPACK_DIR}" ]; then
-    echo "BEGIN MESSAGE"
-    echo "LAPACK selected, but LAPACK_DIR not set. Checking some places..."
-    echo "END MESSAGE"
-    
-    FILES="liblapack.a liblapack.so"
-    DIRS="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib64/atlas /usr/lib/atlas /usr/lib64/atlas-base/atlas /usr/lib/atlas-base/atlas ${HOME}"
-    for file in $FILES; do
-        for dir in $DIRS; do
-            if test -r "$dir/$file"; then
-                LAPACK_DIR="$dir"
-                break
-            fi
-        done
-    done
-    
-    if [ -z "$LAPACK_DIR" ]; then
-        echo "BEGIN MESSAGE"
-        echo "LAPACK not found"
-        echo "END MESSAGE"
-    else
-        echo "BEGIN MESSAGE"
-        echo "Found LAPACK in ${LAPACK_DIR}"
-        echo "END MESSAGE"
-    fi
+# Take care of requests to build the library in any case
+LAPACK_DIR_INPUT=$LAPACK_DIR
+if [ "$(echo "${LAPACK_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]; then
+    LAPACK_BUILD=yes
+    LAPACK_DIR=
+else
+    LAPACK_BUILD=
 fi
 
-
+# Try to find the library if build isn't explicitly requested
+if [ -z "${LAPACK_BUILD}" ]; then
+    for pkgname in lapack lapack-openblas lapack-atlas lapack-netlib ; do
+        find_lib LAPACK $pkgname 1 "" "lapack" "" "${LAPACK_DIR}"
+        if [ -n "${LAPACK_DIR}" ]; then
+            break
+        fi
+    done
+fi
 
 ################################################################################
 # Build
 ################################################################################
 
-if [ -z "${LAPACK_DIR}"                                                 \
-     -o "$(echo "${LAPACK_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+if [ -n "$LAPACK_BUILD" -o -z "${LAPACK_DIR}" ]
 then
     echo "BEGIN MESSAGE"
     echo "Using bundled LAPACK..."
@@ -88,6 +77,9 @@ then
     fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     LAPACK_DIR=${INSTALL_DIR}
+    LAPACK_LIBS='lapack'
+    LAPACK_INC_DIRS=
+    LAPACK_LIB_DIRS=${LAPACK_DIR}/lib
 
     if [ "${F77}" = "none" ]; then
         echo 'BEGIN ERROR'
@@ -182,16 +174,6 @@ fi
 ################################################################################
 # Configure Cactus
 ################################################################################
-
-# Set options
-if [ "${LAPACK_DIR}" != 'NO_BUILD' ]; then
-    : ${LAPACK_INC_DIRS=}
-    : ${LAPACK_LIB_DIRS="${LAPACK_DIR}"}
-fi
-: ${LAPACK_LIBS='lapack'}
-
-LAPACK_INC_DIRS="$(${CCTK_HOME}/lib/sbin/strip-incdirs.sh ${LAPACK_INC_DIRS})"
-LAPACK_LIB_DIRS="$(${CCTK_HOME}/lib/sbin/strip-libdirs.sh ${LAPACK_LIB_DIRS})"
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
