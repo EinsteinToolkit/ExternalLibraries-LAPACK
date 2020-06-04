@@ -75,7 +75,7 @@ then
 
     # Set locations
     THORN=LAPACK
-    NAME=lapack-3.4.2
+    NAME=lapack-3.9.0
     SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${LAPACK_INSTALL_DIR}" ]; then
