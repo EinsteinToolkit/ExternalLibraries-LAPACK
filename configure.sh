@@ -28,7 +28,7 @@ fi
 # Try to find the library if build isn't explicitly requested
 if [ -z "${LAPACK_BUILD}" ]; then
     for pkgname in lapack lapack-openblas lapack-atlas lapack-netlib ; do
-        find_lib LAPACK $pkgname 1 "" "lapack" "" "${LAPACK_INPUT_DIR}"
+        find_lib LAPACK $pkgname 1 "" "lapack" "" "${LAPACK_DIR}"
         if [ -n "${LAPACK_DIR}" ]; then
             break
         fi
