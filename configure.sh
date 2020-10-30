@@ -79,8 +79,7 @@ then
     LAPACK_DIR=${INSTALL_DIR}
     LAPACK_LIBS='lapack'
     LAPACK_INC_DIRS=
-    # BLAS and LAPACK traditionlally use BLAS_DIR as the library location
-    LAPACK_LIB_DIRS=${LAPACK_DIR}
+    LAPACK_LIB_DIRS=${LAPACK_DIR}/lib
 
     if [ "${F77}" = "none" ]; then
         echo 'BEGIN ERROR'
