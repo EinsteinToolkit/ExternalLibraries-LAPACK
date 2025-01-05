@@ -75,7 +75,7 @@ then
 
     # Set locations
     THORN=LAPACK
-    NAME=lapack-3.9.0
+    NAME=lapack-3.12.0
     SRCDIR="$(dirname $0)"
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${LAPACK_INSTALL_DIR}" ]; then
@@ -132,29 +132,19 @@ then
         ${TAR?} xzf ${SRCDIR}/dist/${NAME}.tgz
         
         echo "LAPACK: Configuring..."
-        cd ${NAME}/SRC
+        cd ${NAME}
         
         echo "LAPACK: Building..."
-        #if echo ${F77} | grep -i xlf > /dev/null 2>&1; then
-        #    FIXEDF77FLAGS=-qfixed
-        #fi
-        if ${F77} -qversion 2>/dev/null | grep -q 'IBM XL Fortran'; then
-            FIXEDF77FLAGS=-qfixed
-        fi
-        #${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c *.f ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
-        #${AR} ${ARFLAGS} liblapack.a *.o
-	#if [ ${USE_RANLIB} = 'yes' ]; then
-	#    ${RANLIB} ${RANLIBFLAGS} liblapack.a
-        #fi
-        cat > make.cactus <<EOF
-SRCS = $(echo *.f) ../INSTALL/dlamch.f ../INSTALL/ilaver.f ../INSTALL/lsame.f ../INSTALL/slamch.f
-liblapack.a: \$(SRCS:%.f=%.o)
-	${AR} ${ARFLAGS} \$@ \$^
-	${RANLIB} ${RANLIBFLAGS} \$@
-%.o: %.f
-	${F77} ${F77FLAGS} ${FIXEDF77FLAGS} -c \$*.f -o \$*.o
+        cat > make.inc <<EOF
+FC = $F90
+FFLAGS = $F90FLAGS
+FFLAGS_DRV = \$(FFLAGS)
+TIMER = NONE
+
+BLASLIB      = \$(TOPSRCDIR)/libblas.a
+LAPACKLIB    = \$(TOPSRCDIR)/liblapack.a
 EOF
-        ${MAKE} -f make.cactus
+        ${MAKE} lapacklib
         
         echo "LAPACK: Installing..."
         cp liblapack.a ${LAPACK_DIR}
